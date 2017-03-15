@@ -19,12 +19,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class ExampleTest {
 
-    private static final String URL = "http://cbr-demo-admin.demo.pointid.ru";
+    private static String USERNAME_CENTRBANK = "USERNAME_CENTRBANK";
+    private static String PASSWORD_CENTRBANK = "PASSWORD_CENTRBANK";
+    private static final String CHROME_DRIVER = "chromedriver.exe";
+
     private static final String XML_FILE = "regions.xml";
     private static final String STATISTICS = "Статистика";
 
     private WebDriver driver;
-    private String baseUrl;
     private StringBuffer verificationErrors;
     private Document document;
 
@@ -36,10 +38,8 @@ public class ExampleTest {
 
     @Test
     public void testAuto() throws Exception {
-        driver.get(baseUrl + "/region/");
-
+        login();
         NodeList regions = document.getElementsByTagName("region");
-
         traverseRegions(regions);
     }
 
@@ -52,11 +52,14 @@ public class ExampleTest {
         }
     }
 
+    private void login() throws Exception {
+        driver.get("http://" + System.getenv(USERNAME_CENTRBANK) + ":" + System.getenv(PASSWORD_CENTRBANK) + "@cbr2.demo.pointid.ru/region/");
+    }
+
     private void prepareSelenium() throws Exception {
         verificationErrors = new StringBuffer();
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
         driver = new ChromeDriver();
-        baseUrl = URL;
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
     }
 
