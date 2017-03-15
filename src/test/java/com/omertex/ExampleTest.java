@@ -84,7 +84,7 @@ public class ExampleTest {
         for (int j = 0; j < years.getLength(); j++) {
             Element yearElement = (Element) years.item(j);
 
-            driver.findElement(By.xpath(yearElement.getAttribute("id"))).click();
+            driver.findElement(By.cssSelector("[href=\"#RegIndicatorList_year" + yearElement.getAttribute("id") + "\"]")).click();
             assertTrue(isElementPresent(By.linkText(yearElement.getElementsByTagName("property1").item(0).getTextContent())));
             assertTrue(isElementPresent(By.linkText(yearElement.getElementsByTagName("property2").item(0).getTextContent())));
         }
