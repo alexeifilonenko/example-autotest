@@ -1,17 +1,16 @@
 package com.omertex;
 
-import java.io.File;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import com.omertex.model.Region;
+import com.omertex.model.Year;
+import com.omertex.service.RegionService;
+import com.omertex.service.XMLRegionService;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * by afilonenko on 3/14/2017.
@@ -19,27 +18,24 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class ExampleTest {
 
-    private static String USERNAME_CENTRBANK = "USERNAME_CENTRBANK";
-    private static String PASSWORD_CENTRBANK = "PASSWORD_CENTRBANK";
+    private static final String USERNAME_CENTRBANK = "USERNAME_CENTRBANK";
+    private static final String PASSWORD_CENTRBANK = "PASSWORD_CENTRBANK";
     private static final String CHROME_DRIVER = "chromedriver.exe";
-
-    private static final String XML_FILE = "regions.xml";
     private static final String STATISTICS = "Статистика";
 
     private WebDriver driver;
     private StringBuffer verificationErrors;
-    private Document document;
 
     @Before
     public void setUp() throws Exception {
-        prepareSelenium();
-        prepareXMLFile();
+        setUpSelenium();
+        login();
     }
 
     @Test
     public void testAuto() throws Exception {
-        login();
-        NodeList regions = document.getElementsByTagName("region");
+        RegionService regionService = new XMLRegionService();
+        List<Region> regions = regionService.getRegions();
         traverseRegions(regions);
     }
 
@@ -52,44 +48,32 @@ public class ExampleTest {
         }
     }
 
-    private void login() throws Exception {
-        driver.get("http://" + System.getenv(USERNAME_CENTRBANK) + ":" + System.getenv(PASSWORD_CENTRBANK) + "@cbr2.demo.pointid.ru/region/");
-    }
-
-    private void prepareSelenium() throws Exception {
+    private void setUpSelenium() throws Exception {
         verificationErrors = new StringBuffer();
-        System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", CHROME_DRIVER);
         driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
     }
 
-    private void prepareXMLFile() throws Exception {
-        File file = new File(XML_FILE);
-        DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        document = dBuilder.parse(file);
-        // recommended action
-        document.getDocumentElement().normalize();
+    private void login() throws Exception {
+        /*driver.get("http://" + System.getenv(USERNAME_CENTRBANK) + ":" + System.getenv(PASSWORD_CENTRBANK) + "@cbr2.demo.pointid.ru/region/");*/
+        driver.get(String.format("http://%s:%s@cbr2.demo.pointid.ru/region/", System.getenv(USERNAME_CENTRBANK), System.getenv(PASSWORD_CENTRBANK)));
     }
 
-    private void traverseRegions(NodeList regions) {
-        for (int i = 0; i < regions.getLength(); i++) {
-            Element regionElement = (Element) regions.item(i);
-
-            driver.findElement(By.linkText(regionElement.getAttribute("id"))).click();
+    private void traverseRegions(List<Region> regions) {
+        for (Region region:regions) {
+            driver.findElement(By.linkText(region.getId())).click();
             driver.findElement(By.linkText(STATISTICS)).click();
-
-            NodeList years = regionElement.getElementsByTagName("year");
+            List<Year> years = region.getYears();
             traverseYears(years);
         }
     }
 
-    private void traverseYears(NodeList years) {
-        for (int j = 0; j < years.getLength(); j++) {
-            Element yearElement = (Element) years.item(j);
-
-            driver.findElement(By.cssSelector("[href=\"#RegIndicatorList_year" + yearElement.getAttribute("id") + "\"]")).click();
-            assertTrue(isElementPresent(By.linkText(yearElement.getElementsByTagName("property1").item(0).getTextContent())));
-            assertTrue(isElementPresent(By.linkText(yearElement.getElementsByTagName("property2").item(0).getTextContent())));
+    private void traverseYears(List<Year> years) {
+        for (Year year:years) {
+            driver.findElement(By.cssSelector("[href=\"#RegIndicatorList_year" + year.getId() + "\"]")).click();
+            assertTrue(isElementPresent(By.linkText(year.getProperty1())));
+            assertTrue(isElementPresent(By.linkText(year.getProperty2())));
         }
     }
 
