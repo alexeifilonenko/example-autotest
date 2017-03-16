@@ -56,7 +56,6 @@ public class ExampleTest {
     }
 
     private void login() throws Exception {
-        /*driver.get("http://" + System.getenv(USERNAME_CENTRBANK) + ":" + System.getenv(PASSWORD_CENTRBANK) + "@cbr2.demo.pointid.ru/region/");*/
         driver.get(String.format("http://%s:%s@cbr2.demo.pointid.ru/region/", System.getenv(USERNAME_CENTRBANK), System.getenv(PASSWORD_CENTRBANK)));
     }
 
@@ -71,7 +70,7 @@ public class ExampleTest {
 
     private void traverseYears(List<Year> years) {
         for (Year year:years) {
-            driver.findElement(By.cssSelector("[href=\"#RegIndicatorList_year" + year.getId() + "\"]")).click();
+            driver.findElement(By.cssSelector(String.format("[href=\"#RegIndicatorList_year%s\"]", year.getId()))).click();
             assertTrue(isElementPresent(By.linkText(year.getProperty1())));
             assertTrue(isElementPresent(By.linkText(year.getProperty2())));
         }
