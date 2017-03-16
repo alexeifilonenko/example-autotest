@@ -61,8 +61,15 @@ public class ExampleTest {
 
     private void traverseRegions(List<Region> regions) {
         for (Region region:regions) {
-            driver.findElement(By.linkText(region.getId())).click();
-            driver.findElement(By.linkText(STATISTICS)).click();
+            By regionButton = By.linkText(region.getId());
+            By statisticsButton = By.linkText(STATISTICS);
+
+            assertTrue(isElementPresent(regionButton));
+            driver.findElement(regionButton).click();
+
+            assertTrue(isElementPresent(By.linkText(region.getId())));
+            driver.findElement(statisticsButton).click();
+
             List<Year> years = region.getYears();
             traverseYears(years);
         }
@@ -70,18 +77,17 @@ public class ExampleTest {
 
     private void traverseYears(List<Year> years) {
         for (Year year:years) {
-            driver.findElement(By.cssSelector(String.format("[href=\"#RegIndicatorList_year%s\"]", year.getId()))).click();
+            By yearButton = By.cssSelector(String.format("[href='#RegIndicatorList_year%s']", year.getId()));
+
+            assertTrue(isElementPresent(yearButton));
+            driver.findElement(yearButton).click();
+
             assertTrue(isElementPresent(By.linkText(year.getProperty1())));
             assertTrue(isElementPresent(By.linkText(year.getProperty2())));
         }
     }
 
     private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        return driver.findElement(by).isDisplayed();
     }
 }

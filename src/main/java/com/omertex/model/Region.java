@@ -1,5 +1,6 @@
 package com.omertex.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import java.util.List;
 
 /**
@@ -10,6 +11,7 @@ public class Region {
     private String id;
     private List<Year> years;
 
+    @XmlAttribute
     public String getId() {
         return id;
     }

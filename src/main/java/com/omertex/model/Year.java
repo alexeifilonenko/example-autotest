@@ -1,5 +1,7 @@
 package com.omertex.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+
 /**
  * by afilonenko on 3/15/2017.
  */
@@ -9,6 +11,7 @@ public class Year {
     private String property1;
     private String property2;
 
+    @XmlAttribute
     public String getId() {
         return id;
     }
